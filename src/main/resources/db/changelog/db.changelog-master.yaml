@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - include:
+      file: /db/changelog/changes/create-cars-table.sql
+  - include:
+      file: /db/changelog/changes/create-users-table.sql
+  - include:
+      file: /db/changelog/changes/create-roles-table.sql
+  - include:
+      file: /db/changelog/changes/create-users-roles-table.sql
+  - include:
+      file: /db/changelog/changes/create-rentals-table.sql
+  - include:
+      file: /db/changelog/changes/create_payments-table.sql
+  - include:
+      file: /db/changelog/changes/create-cars-in-db.sql
+  - include:
+      file: /db/changelog/changes/create-role-in-db.sql
+  - include:
+      file: /db/changelog/changes/insert-user-to-db.sql
+  - include:
+      file: /db/changelog/changes/give-user-their-role.sql

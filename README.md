@@ -110,6 +110,6 @@
 
 > Also, you can use my postman collection
 
-[Collection for local run](postman.collections/car-sharing-service.postman_collection.json)
-[Collection for docker run](postman.collections/car-sharing-service for docker.postman_collection.json)
+- [Collection for local run](postman.collections/car-sharing-service.postman_collection.json)
+- [Collection for docker run](postman.collections/car-sharing-service for docker.postman_collection.json)
 >Just import it to your Postman and enjoy! Good luck!

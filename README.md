@@ -47,6 +47,8 @@
 - update own info
 - update user's role
 
+> Two users have already existed in the database. Manager has login: bob@gmail.com, password : admin123. Customer - login: alice@gmail.com, password: custom123
+
 #### :hammer: Technologies
 - Java 17
 - Spring Boot 3.1.0
@@ -110,6 +112,9 @@
 
 > Also, you can use my postman collection
 
-- [Collection for local run](postman.collections/car-sharing-service.postman_collection.json)
-- [Collection for docker run](postman.collections/car-sharing-service%20for%20docker.postman_collection.json)
+- [Collection for local run](postman.collections/car-sharing-service.postman_collection.json) 
+or [this link](https://www.postman.com/supply-observer-16858482/workspace/for-people/collection/27238121-3ac30850-3272-4643-adc5-cb50552da2bd?action=share&creator=27238121)
+- [Collection for docker run](postman.collections/car-sharing-service%20for%20docker.postman_collection.json) 
+or [this link](https://www.postman.com/supply-observer-16858482/workspace/for-people/collection/27238121-7cc8d2bb-cae7-4be3-b986-4fc7608c6366?action=share&creator=27238121)
+- if you want to run tests, you should run docker before this.
 >Just import it to your Postman and enjoy! Good luck!

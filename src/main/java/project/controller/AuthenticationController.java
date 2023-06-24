@@ -1,4 +1,4 @@
-package project.controler;
+package project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,36 +31,26 @@ public class AuthenticationController {
     private final NotificationService notificationService;
 
     @PostMapping("/register")
-    @Operation(summary = "endpoint for registration new user",
-            description = "Data for registration. Be attentive that password and "
-                    + "repeatPassword should be the same")
+    @Operation(summary = "Endpoint for registering a new user",
+            description = "Provide data for registration. Make sure that password and "
+                    + "repeatPassword are the same")
     public UserResponseDto register(
-            @Parameter(schema = @Schema(type = "String",
-                    defaultValue = "{\n"
-                            + "\"email\":\"your@gmail.com\",\n"
-                            + "\"password\":\"12345678\",\n"
-                            + "\"repeatPassword\":\"12345678\",\n"
-                            + "\"firstName\":\"YourName\",\n"
-                            + "\"lastName\":\"YourLastName\" \n"
-                            + "}"))
+            @Parameter(schema = @Schema(implementation = UserRegisterRequestDto.class))
             @RequestBody @Valid UserRegisterRequestDto userRegisterDto) {
         User user = authenticationService.register(userRegisterDto.getEmail(),
                 userRegisterDto.getPassword(),
                 userRegisterDto.getFirstName(),
                 userRegisterDto.getLastName());
-        notificationService.sendMessageToAdministrators("New user was registered");
+        notificationService.sendMessageToAdministrators(String
+                .format("New user was registered with email: %s", userRegisterDto.getEmail()));
         return responseDtoMapper.mapToDto(user);
     }
 
     @PostMapping("/login")
-    @Operation(summary = "endpoint for login as an user",
-            description = "here you can send your login and password ")
+    @Operation(summary = "Endpoint for user login",
+            description = "Provide login and password for authentication")
     public ResponseEntity<Object> login(
-            @Parameter(schema = @Schema(type = "String",
-                    defaultValue = "{\n"
-                            + "\"login\":\"your login\",\n"
-                            + "\"password\":\"your password\"\n"
-                            + "}"))
+            @Parameter(schema = @Schema(implementation = UserLoginRequestDto.class))
             @RequestBody @Valid UserLoginRequestDto userLoginDto)
             throws AuthenticationException {
         User user = authenticationService.login(userLoginDto.getLogin(),

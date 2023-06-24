@@ -1,10 +1,9 @@
-package project.controler;
+package project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -38,13 +37,11 @@ public class UserController {
     private final NotificationService notificationService;
 
     @PutMapping("/{id}/role")
-    @Operation(summary = "endpoint for manager and updating role at user")
+    @Operation(summary = "Endpoint for updating the role of a user by a manager")
     public UserResponseDto updateRole(
-            @Parameter(description = "User id", schema = @Schema(type = "Integer",
-                    defaultValue = "1"))
+            @Parameter(description = "User ID")
             @PathVariable Long id,
-            @Parameter(description = "role Name", schema = @Schema(type = "String",
-                    defaultValue = "MANAGER"))
+            @Parameter(description = "Role Name")
             @RequestParam String role) {
         User userById = userService.findById(id);
         Role byRoleName = roleService.findByRoleName(RoleName.valueOf(role));
@@ -58,28 +55,21 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    @Operation(description = "endpoint for getting your own information")
+    @Operation(description = "Endpoint to get your own information")
     public UserResponseDto getMe(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        return responseDtoMapper.mapToDto(userService.findByEmail(userDetails
-                .getUsername()).orElseThrow(()
-                        -> new NoSuchElementException("Can't find user by email")));
+        return responseDtoMapper.mapToDto(userService.findByEmail(userDetails.getUsername()));
     }
 
     @PutMapping("/me")
-    @Operation(summary = "endpoint for update info",
-            description = "endpoint for update your own information (except your role)")
+    @Operation(summary = "Endpoint to update information",
+            description = "Endpoint to update your own information (except your role)")
     public UserResponseDto updateInfo(Authentication authentication,
-                                      @Parameter(schema = @Schema(type = "String",
-                                              defaultValue = "{\n"
-                                                      + "\"email\":\"your new email\", \n"
-                                                      + "\"password\":\"your new password\", \n"
-                                                      + "\"firstName\":\"your new First name\", \n"
-                                                      + "\"lastName\":\"your new Last name\" }"))
+                                      @Parameter(schema = @Schema(implementation =
+                                              UserRequestDto.class))
                                       @RequestBody UserRequestDto userRequestDto) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        User userToUpdate = userService.findByEmail(userDetails.getUsername()).orElseThrow(()
-                -> new NoSuchElementException("Can't find user by email"));
+        User userToUpdate = userService.findByEmail(userDetails.getUsername());
         User user = requestDtoMapper.mapToModel(userRequestDto);
         user.setId(userToUpdate.getId());
         user.setRoles(userToUpdate.getRoles());

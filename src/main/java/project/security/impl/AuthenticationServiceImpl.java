@@ -1,6 +1,5 @@
 package project.security.impl;
 
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,10 +31,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public User login(String email, String password) throws AuthenticationException {
-        Optional<User> user = userService.findByEmail(email);
-        if (user.isEmpty() || !passwordEncoder.matches(password, user.get().getPassword())) {
+        User user = userService.findByEmail(email);
+        if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new AuthenticationException("Incorrect email or password");
         }
-        return user.get();
+        return user;
     }
 }

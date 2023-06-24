@@ -2,7 +2,6 @@ package project.service.impl;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,8 +44,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException(String
+                .format("Can't find user with email: %s in the db", email)));
     }
 
     @Override

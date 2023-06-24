@@ -1,8 +1,9 @@
-package project.controler;
+package project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,33 +39,26 @@ public class CarController {
     private final NotificationService notificationService;
 
     @PostMapping
-    @Operation(summary = "endpoint for creating car",
-            description = "endpoint for create car in DB. Only manager has permitting")
+    @Operation(summary = "Endpoint for creating a car",
+            description = "Endpoint to create a car in the database. Only managers are permitted.")
     public CarResponseDto add(
-            @Parameter(schema = @Schema(type = "String",
-                    defaultValue = "{\n"
-                            + "\"model\":\"car model\", \n"
-                            + "\"brand\":\"car brand\",\n"
-                            + "\"carType\":\"car type\", \n"
-                            + "\"inventory\":6, \n"
-                            + "\"dailyFee\":123.00 \n"
-                            + "}"))
+            @Parameter(schema = @Schema(implementation = CarRequestDto.class))
             @RequestBody CarRequestDto carRequestDto) {
         Car car = carService.save(requestDtoMapper.mapToModel(carRequestDto));
-        notificationService.sendMessageToAdministrators("New car was created with id: "
-                + car.getId());
+        notificationService.sendMessageToAdministrators(String
+                .format("New car was created with id: %s", car.getId()));
         return responseDtoMapper.mapToDto(car);
     }
 
     @GetMapping
-    @Operation(summary = "endpoint for get all car with pagination and sorting",
-            description = "endpoint for getting all cars with pagination and sorting")
+    @Operation(summary = "Endpoint to get all cars with pagination and sorting",
+            description = "Endpoint to get all cars with pagination and sorting")
     public List<CarResponseDto> findAll(
-            @Parameter(schema = @Schema(type = "Integer", description = "Car per page"))
+            @Parameter(description = "Number of cars per page")
             @RequestParam(defaultValue = "10") Integer count,
-            @Parameter(schema = @Schema(type = "Integer", description = "Number of page"))
+            @Parameter(description = "Page number")
             @RequestParam(defaultValue = "0") Integer page,
-            @Parameter(schema = @Schema(type = "String", description = "Sorting type (DESC or ASC"))
+            @Parameter(description = "Sorting type (ASC or DESC)")
             @RequestParam(defaultValue = "id") String sortBy) {
         Sort sort = Sort.by(RequestParamParser.toSortOrders(sortBy));
         Pageable pageable = PageRequest.of(page, count, sort);
@@ -74,11 +68,10 @@ public class CarController {
     }
 
     @GetMapping("/by-params")
-    @Operation(summary = "endpoint for getting car and filtering their characteristics",
-            description = "endpoint for filtering car")
+    @Operation(summary = "Endpoint to get cars by filtering their characteristics",
+            description = "Endpoint to filter cars")
     public List<CarResponseDto> findAllByParams(
-            @Parameter(schema = @Schema(type = "String",
-                    description = "filtering by field. For example: modelIn=X5"))
+            @Parameter(description = "Filtering by field. For example: modelIn=X5")
             @RequestParam Map<String, String> params) {
         return carService.findAllByParams(params).stream()
                 .map(responseDtoMapper::mapToDto)
@@ -86,30 +79,22 @@ public class CarController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "endpoint for getting car by id",
-            description = "endpoint for getting car by id")
+    @Operation(summary = "Endpoint to get a car by ID",
+            description = "Endpoint to get a car by its ID")
     public CarResponseDto getById(
-            @Parameter(schema = @Schema(type = "Integer", description = "Car id"))
+            @Parameter(description = "Car ID")
             @PathVariable Long id) {
         return responseDtoMapper.mapToDto(carService.findById(id));
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "endpoint for update car",
-            description = "endpoint for updating car")
+    @Operation(summary = "Endpoint to update a car",
+            description = "Endpoint to update a car")
     public CarResponseDto updateInfo(
-            @Parameter(schema = @Schema(type = "Integer", description = "Car id"))
+            @Parameter(description = "Car ID")
             @PathVariable Long id,
-            @Parameter(schema = @Schema(type = "String",
-                    defaultValue = "{\n"
-                            + "\"model\":\"X5\",\n"
-                            + "\"brand\":\"BMW\",\n"
-                            + "\"carType\":\"UNIVERSAL\",\n"
-                            + "\"inventory\":5, \n"
-                            + "\"dailyFee\":100.00 \n"
-                            + "}"))
-
-            @RequestBody CarRequestDto carRequestDto) {
+            @Parameter(schema = @Schema(implementation = CarRequestDto.class))
+            @Valid @RequestBody CarRequestDto carRequestDto) {
         Car updatedCar = carService.update(id, requestDtoMapper.mapToModel(carRequestDto));
         notificationService
                 .sendMessageToAdministrators(String
@@ -118,10 +103,10 @@ public class CarController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "endpoint for deleting car",
-            description = "endpoint for deleting car from DB")
+    @Operation(summary = "Endpoint to delete a car",
+            description = "Endpoint to delete a car from the database")
     public void delete(
-            @Parameter(schema = @Schema(type = "Integer", description = "Car id"))
+            @Parameter(description = "Car ID")
             @PathVariable Long id) {
         notificationService
                 .sendMessageToAdministrators(String
@@ -130,22 +115,22 @@ public class CarController {
     }
 
     @PostMapping("/add/{id}")
-    @Operation(summary = "endpoint for adding car",
-            description = "endpoint for adding 1 car to inventory")
+    @Operation(summary = "Endpoint to add a car to the inventory",
+            description = "Endpoint to add one car to the inventory")
     public CarResponseDto addCarToInventory(
-            @Parameter(schema = @Schema(type = "Integer", description = "Car id"))
+            @Parameter(description = "Car ID")
             @PathVariable Long id) {
         notificationService
                 .sendMessageToAdministrators(String
-                        .format("Car by id: %s was add ot inventory", id));
+                        .format("Car by id: %s was add to inventory", id));
         return responseDtoMapper.mapToDto(carService.addCarToInventory(id));
     }
 
     @DeleteMapping("/remove/{id}")
-    @Operation(summary = "endpoint for remove car",
-            description = "endpoint for removing 1 car from inventory")
+    @Operation(summary = "Endpoint to remove a car from the inventory",
+            description = "Endpoint to remove one car from the inventory")
     public CarResponseDto removeCarFromInventory(
-            @Parameter(schema = @Schema(type = "Integer", description = "Car id"))
+            @Parameter(description = "Car ID")
             @PathVariable Long id) {
         notificationService
                 .sendMessageToAdministrators(String

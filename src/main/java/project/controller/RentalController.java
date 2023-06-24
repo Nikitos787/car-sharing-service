@@ -1,10 +1,9 @@
-package project.controler;
+package project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -37,20 +36,14 @@ public class RentalController {
     private final UserService userService;
 
     @PostMapping
-    @Operation(summary = "endpoint for add rental",
-            description = "endpoint fpr creating rental")
+    @Operation(summary = "Endpoint to add a rental",
+            description = "Endpoint to create a rental")
     public RentalResponseDto add(Authentication authentication,
-                                 @Parameter(schema = @Schema(type = "String",
-                                         defaultValue = "{ \n"
-                                                 + "\"rentalDate\":\"date when you rent car\", \n"
-                                                 + "\"rentalReturn\":\"date for return\", \n"
-                                                 + "\"carId\": 1 \n"
-                                                 + "}"))
+                                 @Parameter(schema = @Schema(implementation =
+                                         RentalRequestDto.class))
                                  @RequestBody RentalRequestDto rentalRequestDto) {
         Rental rentalForSave = requestDtoMapper.mapToModel(rentalRequestDto);
-        User user = userService.findByEmail(authentication.getName()).orElseThrow(() ->
-                new NoSuchElementException(String.format("User with email: %s doesn't exist in DB",
-                        authentication.getName())));
+        User user = userService.findByEmail(authentication.getName());
         rentalForSave.setUser(user);
         Rental savedRental = rentalService.save(rentalForSave);
         notificationService.sendMessageAboutSuccessRent(savedRental);
@@ -58,11 +51,11 @@ public class RentalController {
     }
 
     @PutMapping("/{id}/return")
-    @Operation(summary = "endpoint for return car by rental",
-            description = "endpoint for return car only for manager because based on actual "
-                    + "return date will calculate price to pay")
+    @Operation(summary = "Endpoint to return a car for a rental",
+            description = "Endpoint to return a car for a rental. Only managers are permitted, "
+                   + "as the actual return date will be used to calculate the price to pay")
     public RentalResponseDto returnRental(
-            @Parameter(schema = @Schema(type = "Integer", description = "rental id"))
+            @Parameter(description = "Rental ID")
             @PathVariable Long id) {
         notificationService
                 .sendMessageToAdministrators(String
@@ -71,12 +64,12 @@ public class RentalController {
     }
 
     @GetMapping
-    @Operation(summary = "endpoint for finding rental by user id and status",
-            description = "endpoint for getting rental by user id and status(returned or not")
+    @Operation(summary = "Endpoint to find rentals by user ID and status",
+            description = "Endpoint to get rentals by user ID and status (returned or not)")
     public List<RentalResponseDto> findAllByUserIdAndIsAlive(
-            @Parameter(schema = @Schema(type = "Integer", description = "user id"))
+            @Parameter(description = "User ID")
             @RequestParam Long userId,
-            @Parameter(schema = @Schema(type = "boolean"), description = "true or false")
+            @Parameter(description = "Status (true or false)")
             @RequestParam boolean status) {
         return rentalService.findByIdAndIsActive(userId, status).stream()
                 .map(responseDtoMapper::mapToDto)
@@ -84,17 +77,17 @@ public class RentalController {
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "endpoint for finding rental by id",
-            description = "endpoint for getting rental by id")
+    @Operation(summary = "Endpoint to find a rental by ID",
+            description = "Endpoint to get a rental by ID")
     public RentalResponseDto findById(
-            @Parameter(schema = @Schema(type = "Integer", description = "rental id"))
+            @Parameter(description = "Rental ID")
             @PathVariable Long id) {
         return responseDtoMapper.mapToDto(rentalService.findById(id));
     }
 
     @GetMapping("/my-rentals")
-    @Operation(summary = "endpoint for getting all own rentals",
-            description = "endpoint for getting your own rentals")
+    @Operation(summary = "Endpoint to get all own rentals",
+            description = "Endpoint to get all rentals owned by the authenticated user")
     public List<RentalResponseDto> findAllMyRentals(Authentication authentication) {
         return rentalService.findAll().stream()
                 .filter(r -> r.getUser().getEmail().equals(authentication.getName()))

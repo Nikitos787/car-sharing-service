@@ -42,7 +42,7 @@ class RentalServiceImplTest {
         car.setId(EXPECTED_ID);
         car.setDeleted(false);
         car.setCarType(CarType.SUV);
-        car.setBrand("BRand");
+        car.setBrand("Brand");
         car.setModel("Model");
         car.setDailyFee(BigDecimal.TEN);
 

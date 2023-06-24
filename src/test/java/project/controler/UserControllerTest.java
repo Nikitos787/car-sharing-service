@@ -3,7 +3,6 @@ package project.controler;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import java.util.Set;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -84,8 +83,8 @@ class UserControllerTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
         when(userService.findByEmail(anyString()))
-                .thenReturn(Optional.of(new User(1L, "nikitosik@i.ua", "Nikita", "Salohub",
-                        "11111111", 121211L, Set.of(manager))));
+                .thenReturn(new User(1L, "nikitosik@i.ua", "Nikita", "Salohub",
+                        "11111111", 121211L, Set.of(manager)));
 
         RestAssuredMockMvc
                 .when()
@@ -106,7 +105,7 @@ class UserControllerTest {
                 "11111111", 121211L, Set.of(customer));
 
         when(userService.findByEmail(anyString()))
-                .thenReturn(Optional.of(userBeforeUpdate));
+                .thenReturn(userBeforeUpdate);
         when(userService.update(Mockito.any(User.class)))
                 .thenReturn(userAfterUpdate);
 

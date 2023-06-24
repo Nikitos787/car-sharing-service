@@ -1,7 +1,5 @@
 package project.dto.response;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,9 +12,7 @@ import project.model.payment.PaymentType;
 @NoArgsConstructor
 public class PaymentResponseDto {
     private Long id;
-    @Enumerated(EnumType.STRING)
     private PaymentStatus status;
-    @Enumerated(EnumType.STRING)
     private PaymentType type;
     private Long rentalId;
     private String sessionUrl;

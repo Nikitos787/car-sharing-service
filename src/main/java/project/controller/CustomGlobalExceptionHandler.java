@@ -1,4 +1,4 @@
-package project.controler;
+package project.controller;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;

@@ -1,9 +1,10 @@
-package project.controler;
+package project.controller;
 
 import com.stripe.model.checkout.Session;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,22 +41,17 @@ public class PaymentController {
     private final NotificationService notificationService;
 
     @PostMapping
-    @Operation(summary = "endpoint for create paymenet",
-            description = "endpoint for creating payment")
+    @Operation(summary = "Endpoint for creating a payment",
+            description = "Endpoint for creating a payment")
     public PaymentResponseDto createPaymentSession(
-            @Parameter(schema = @Schema(type = "String",
-                    defaultValue = "{\n"
-                            + "\"rentalId\":1, \n"
-                            + "\"type\":\"PAYMENT\" \n"
-                            + "}"))
-            @RequestBody PaymentRequestDto dto) {
-        Payment payment = requestDtoMapper.mapToModel(dto);
+            @Parameter(schema = @Schema(implementation = PaymentRequestDto.class))
+            @Valid @RequestBody PaymentRequestDto paymentRequestDto) {
+        Payment payment = requestDtoMapper.mapToModel(paymentRequestDto);
 
         BigDecimal moneyToPay = paymentCalculationService.calculatePaymentAmount(payment);
         BigDecimal moneyToFine = paymentCalculationService.calculateFineAmount(payment.getRental());
 
         payment.setPaymentAmount(moneyToPay);
-        paymentService.save(payment);
 
         Session session = paymentProvider.createPaymentSession(payment.getPaymentAmount(),
                 moneyToFine, payment);
@@ -63,22 +59,19 @@ public class PaymentController {
         payment.setUrl(session.getUrl());
 
         payment = paymentService.save(payment);
-        notificationService
-                .sendMessageToAdministrators(String
-                        .format("Payment for rental with id: %s start", dto.getRentalId()));
-
-        notificationService
-                .sendMessageAboutPaymentToUser(payment, String
-                        .format("You start payment for rental with id: %s", dto.getRentalId()));
-
+        notificationService.sendMessageToAdministrators(String
+                .format("Payment for rental with id: %s started", paymentRequestDto.getRentalId()));
+        notificationService.sendMessageAboutPaymentToUser(payment, String
+                .format("You started payment for rental with id: %s", paymentRequestDto
+                        .getRentalId()));
         return responseDtoMapper.mapToDto(payment);
     }
 
     @GetMapping
-    @Operation(summary = "endpoint for get paymenets by user id",
-            description = "endpoint for getting payment by user id for manager")
+    @Operation(summary = "Endpoint for getting payments by user id",
+            description = "Endpoint for getting payments by user id")
     public List<PaymentResponseDto> getByUserId(
-            @Parameter(schema = @Schema(type = "Integer", description = "user id"))
+            @Parameter(description = "User id", required = true)
             @RequestParam Long userId) {
         return paymentService.getByUserId(userId).stream()
                 .map(responseDtoMapper::mapToDto)
@@ -86,31 +79,36 @@ public class PaymentController {
     }
 
     @GetMapping("/my-payments")
-    @Operation(summary = "endpoint for getting own payments",
-            description = "endpoint for getting own payments")
+    @Operation(summary = "Endpoint for getting own payments",
+            description = "Endpoint for getting own payments")
     public List<PaymentResponseDto> findAllMyPayments(Authentication authentication) {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String userEmail = userDetails.getUsername();
         return paymentService.findAll().stream()
-                .filter(p -> p.getRental().getUser().getEmail().equals(userDetails.getUsername()))
+                .filter(p -> p.getRental().getUser().getEmail().equals(userEmail))
                 .map(responseDtoMapper::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @GetMapping("/success/{id}")
-    @Operation(description = "endpoint that you get after success payment")
+    @Operation(description = "Endpoint that you get after successful payment")
     public PaymentResponseDto getSucceed(
-            @Parameter(schema = @Schema(type = "Integer", description = "payment id"))
+            @Parameter(description = "Payment id", required = true)
             @PathVariable Long id) {
         Payment payment = paymentService.getById(id);
         payment.setStatus(PaymentStatus.PAID);
+        notificationService.sendMessageAboutPaymentToUser(payment, String
+                .format("You successfully paid for your rent: %s", payment.getRental().toString()));
         return responseDtoMapper.mapToDto(paymentService.save(payment));
     }
 
     @GetMapping("/cancel/{id}")
-    @Operation(description = "endpoint that you get after decline your payment")
+    @Operation(description = "Endpoint that you get after declining your payment")
     public PaymentResponseDto getCanceled(
-            @Parameter(schema = @Schema(type = "Integer", description = "payment id"))
+            @Parameter(description = "Payment id", required = true)
             @PathVariable Long id) {
+        notificationService.sendMessageAboutPaymentToUser(paymentService.getById(id), String
+                .format("You cancel payment process. Please pay for your rent with id: %s", id));
         return responseDtoMapper.mapToDto(paymentService.save(paymentService.getById(id)));
     }
 }

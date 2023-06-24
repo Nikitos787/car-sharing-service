@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import com.stripe.model.checkout.Session;
@@ -23,6 +24,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import project.config.SecurityConfig;
 import project.model.Rental;
+import project.model.car.Car;
+import project.model.car.CarType;
 import project.model.payment.Payment;
 import project.model.payment.PaymentStatus;
 import project.model.payment.PaymentType;
@@ -125,6 +128,14 @@ class PaymentControllerTest {
 
     @Test
     public void testGetSucceed() {
+        Role customer = new Role(1L, RoleName.CUSTOMER);
+        User user = new User(1L, "nikitosik@i.ua", "Nikita", "Salohub",
+                "11111111", 121211L, Set.of(customer));
+        Car car = new Car(1L, "Model", "Brand", 6, BigDecimal.valueOf(100),
+                CarType.SUV, false);
+        Rental rental = new Rental(1L, LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(), null, car, user);
+
         Long paymentId = 1L;
         Payment payment = new Payment();
         payment.setId(paymentId);
@@ -133,11 +144,10 @@ class PaymentControllerTest {
         payment.setUrl("exampleUrl");
         payment.setPaymentAmount(BigDecimal.TEN);
         payment.setType(PaymentType.PAYMENT);
-        payment.setRental(new Rental());
+        payment.setRental(rental);
 
         when(paymentService.getById(anyLong())).thenReturn(payment);
         when(paymentService.save(Mockito.any(Payment.class))).thenReturn(payment);
-
 
         RestAssuredMockMvc.when()
                 .get("/payments/success/{id}", paymentId)
@@ -179,6 +189,14 @@ class PaymentControllerTest {
 
     @Test
     public void testGetCanceled() {
+        Role customer = new Role(1L, RoleName.CUSTOMER);
+        User user = new User(1L, "nikitosik@i.ua", "Nikita", "Salohub",
+                "11111111", 121211L, Set.of(customer));
+        Car car = new Car(1L, "Model", "Brand", 6, BigDecimal.valueOf(100),
+                CarType.SUV, false);
+        Rental rental = new Rental(1L, LocalDateTime.now().minusDays(1),
+                LocalDateTime.now(), null, car, user);
+
         Long paymentId = 1L;
         Payment payment = new Payment();
         payment.setId(paymentId);
@@ -187,7 +205,7 @@ class PaymentControllerTest {
         payment.setUrl("exampleUrl");
         payment.setPaymentAmount(BigDecimal.TEN);
         payment.setType(PaymentType.PAYMENT);
-        payment.setRental(new Rental());
+        payment.setRental(rental);
 
         when(paymentService.getById(anyLong())).thenReturn(payment);
         when(paymentService.save(Mockito.any(Payment.class))).thenReturn(payment);

@@ -1,7 +1,6 @@
 package project.service;
 
 import java.util.List;
-import java.util.Optional;
 import project.model.user.RoleName;
 import project.model.user.User;
 
@@ -12,7 +11,7 @@ public interface UserService {
 
     User findById(Long id);
 
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
 
     List<User> findByRoles(RoleName roleName);
 

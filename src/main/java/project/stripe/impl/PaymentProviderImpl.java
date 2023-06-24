@@ -5,13 +5,16 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import java.math.BigDecimal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import project.model.payment.Payment;
 import project.model.payment.PaymentType;
+import project.service.PaymentService;
 import project.stripe.PaymentProvider;
 
 @Component
+@RequiredArgsConstructor
 public class PaymentProviderImpl implements PaymentProvider {
     private static final String USD = "usd";
     private static final Long QUANTITY = 1L;
@@ -19,10 +22,12 @@ public class PaymentProviderImpl implements PaymentProvider {
     private String secretKey;
     @Value("${stripe-domen}")
     private String domen;
+    private final PaymentService paymentService;
 
     public Session createPaymentSession(BigDecimal payment, BigDecimal fine,
                                         Payment paymentObject) {
         Stripe.apiKey = secretKey;
+        Payment savedPayment = paymentService.save(paymentObject);
         Long paymentId = paymentObject.getId();
         SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)

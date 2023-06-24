@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
@@ -73,7 +72,7 @@ class RentalControllerTest {
         Rental rental = new Rental(1L, LocalDateTime.now().minusDays(1),
                 LocalDateTime.now(), null, car, user);
 
-        when(userService.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(userService.findByEmail(anyString())).thenReturn(user);
         when(rentalService.save(any(Rental.class))).thenReturn(rental);
         when((carService.findById(anyLong()))).thenReturn(car);
 
@@ -151,9 +150,9 @@ class RentalControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     public void shouldReturnOwnRentals() {
-        Role cutomer = new Role(1L, RoleName.CUSTOMER);
+        Role customer = new Role(1L, RoleName.CUSTOMER);
         User user = new User(1L, "nikitosik@i.ua", "Nikita", "Salohub",
-                "11111111", 121211L, Set.of(cutomer));
+                "11111111", 121211L, Set.of(customer));
         Car car = new Car(1L, "Model", "Brand", 6, BigDecimal.valueOf(100),
                 CarType.SUV, false);
         Rental rental = new Rental(1L, LocalDateTime.now().minusDays(1),

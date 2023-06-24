@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -73,7 +72,7 @@ class AuthenticationServiceImplTest {
     @Test
     void login_ok() {
         user.setPassword(passwordEncoder.encode(PASSWORD));
-        when(userService.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(userService.findByEmail(EMAIL)).thenReturn(user);
         User actual = null;
         try {
             actual = authenticationService.login(EMAIL, PASSWORD);
@@ -86,9 +85,9 @@ class AuthenticationServiceImplTest {
     @Test
     void login_notOk() {
         user.setPassword(passwordEncoder.encode(PASSWORD));
-        when(userService.findByEmail("ERROR")).thenReturn(Optional.of(user));
+        when(userService.findByEmail(EMAIL)).thenReturn(user);
         assertThrows(AuthenticationException.class, () -> {
-            authenticationService.login(EMAIL, PASSWORD);
+            authenticationService.login(EMAIL, "ERROR");
         }, "AuthenticationException expected");
     }
 }

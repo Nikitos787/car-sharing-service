@@ -14,7 +14,7 @@ import project.service.mapper.ResponseDtoMapper;
 @Component
 public class PaymentMapper implements ResponseDtoMapper<PaymentResponseDto, Payment>,
         RequestDtoMapper<PaymentRequestDto, Payment> {
-    private final RentalService rentalService;
+    private RentalService rentalService;
 
     @Override
     public PaymentResponseDto mapToDto(Payment payment) {

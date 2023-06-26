@@ -70,7 +70,8 @@ public class TelegramNotificationServiceImpl implements NotificationService {
         List<User> users = userService.findByRoles(RoleName.CUSTOMER);
         for (User user : users) {
             if (user.getChatId() != null
-                    && payment.getRental().getUser().getEmail().equals(user.getEmail())) {
+                    && rentalService.findById(payment.getRental().getId()).getUser().getEmail()
+                    .equals(user.getEmail())) {
                 SendMessage sendMessage = new SendMessage();
                 sendMessage.setChatId(user.getChatId());
                 sendMessage.setText(message);

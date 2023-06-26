@@ -28,7 +28,7 @@ public class PaymentProviderImpl implements PaymentProvider {
                                         Payment paymentObject) {
         Stripe.apiKey = secretKey;
         Payment savedPayment = paymentService.save(paymentObject);
-        Long paymentId = paymentObject.getId();
+        Long paymentId = savedPayment.getId();
         SessionCreateParams.Builder paramsBuilder = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl(domen + "/payments/success/" + paymentId)

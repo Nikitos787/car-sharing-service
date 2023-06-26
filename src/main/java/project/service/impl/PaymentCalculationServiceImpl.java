@@ -29,7 +29,8 @@ public class PaymentCalculationServiceImpl implements PaymentCalculationService 
     }
 
     @Override
-    public BigDecimal calculateFineAmount(Rental rental) {
+    public BigDecimal calculateFineAmount(Payment payment) {
+        Rental rental = rentalService.findById(payment.getRental().getId());
         long daysActual = rental.getActualDate() != null
                 ? ChronoUnit.DAYS.between(rental.getReturnDate(), rental.getActualDate()) : 0;
         BigDecimal dailyFee = rental.getCar().getDailyFee();

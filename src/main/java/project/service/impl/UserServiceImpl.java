@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import project.model.user.RoleName;
 import project.model.user.User;
 import project.repository.UserRepository;
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User findByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new NoSuchElementException(String
                 .format("Can't find user with email: %s in the db", email)));

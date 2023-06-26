@@ -46,7 +46,7 @@ class PaymentRepositoryTest {
     @Test
     @Sql("/scripts/init_payments.sql")
     void findPaymentByRentalUserId_ok() {
-        List<Payment> actual = paymentRepository.findPaymentsByRental_UserId(EXPECTED_ID);
+        List<Payment> actual = paymentRepository.findPaymentByRental_UserId(EXPECTED_ID);
         assertEquals(EXPECTED_SIZE, actual.size());
         assertEquals(EXPECTED_ID, actual.get(POSITION).getRental().getUser().getId());
     }
@@ -54,7 +54,7 @@ class PaymentRepositoryTest {
     @Test
     @Sql("/scripts/init_payments.sql")
     void findPaymentByRentalUserId_notOk() {
-        List<Payment> actual = paymentRepository.findPaymentsByRental_UserId(EXPECTED_ID);
+        List<Payment> actual = paymentRepository.findPaymentByRental_UserId(EXPECTED_ID);
         assertNotEquals(NOT_EXPECTED_SIZE, actual.size());
         assertNotEquals(NOT_EXPECTED_ID, actual.get(POSITION).getRental().getUser().getId());
     }
@@ -62,7 +62,7 @@ class PaymentRepositoryTest {
     @Test
     @Sql("/scripts/init_payments.sql")
     void findPaymentByRentalWrongUserId_notOk() {
-        List<Payment> actual = paymentRepository.findPaymentsByRental_UserId(NOT_EXPECTED_ID);
+        List<Payment> actual = paymentRepository.findPaymentByRental_UserId(NOT_EXPECTED_ID);
         assertEquals(0, actual.size());
         assertThrows(IndexOutOfBoundsException.class, () -> {
             actual.get(POSITION).getRental().getUser().getId();

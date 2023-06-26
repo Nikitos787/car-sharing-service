@@ -49,7 +49,7 @@ public class PaymentController {
         Payment payment = requestDtoMapper.mapToModel(paymentRequestDto);
 
         BigDecimal moneyToPay = paymentCalculationService.calculatePaymentAmount(payment);
-        BigDecimal moneyToFine = paymentCalculationService.calculateFineAmount(payment.getRental());
+        BigDecimal moneyToFine = paymentCalculationService.calculateFineAmount(payment);
 
         payment.setPaymentAmount(moneyToPay);
 

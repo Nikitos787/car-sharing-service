@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import project.dto.request.PaymentRequestDto;
 import project.dto.response.PaymentResponseDto;
+import project.model.Rental;
 import project.model.payment.Payment;
 import project.model.payment.PaymentStatus;
-import project.service.RentalService;
 import project.service.mapper.RequestDtoMapper;
 import project.service.mapper.ResponseDtoMapper;
 
@@ -14,8 +14,6 @@ import project.service.mapper.ResponseDtoMapper;
 @Component
 public class PaymentMapper implements ResponseDtoMapper<PaymentResponseDto, Payment>,
         RequestDtoMapper<PaymentRequestDto, Payment> {
-    private RentalService rentalService;
-
     @Override
     public PaymentResponseDto mapToDto(Payment payment) {
         PaymentResponseDto dto = new PaymentResponseDto();
@@ -34,7 +32,9 @@ public class PaymentMapper implements ResponseDtoMapper<PaymentResponseDto, Paym
         Payment payment = new Payment();
         payment.setStatus(PaymentStatus.PENDING);
         payment.setType(dto.getType());
-        payment.setRental(rentalService.findById(dto.getRentalId()));
+        Rental rental = new Rental();
+        rental.setId(dto.getRentalId());
+        payment.setRental(rental);
         return payment;
     }
 }

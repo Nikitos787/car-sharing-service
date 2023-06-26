@@ -32,7 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<Payment> getByUserId(Long userId) {
-        return paymentRepository.findPaymentsByRental_UserId(userId);
+        return paymentRepository.findPaymentByRental_UserId(userId);
     }
 
     @Override

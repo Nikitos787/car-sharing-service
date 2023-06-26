@@ -67,8 +67,9 @@ class PaymentCalculationServiceImplTest {
     void calculateFineAmount_shouldReturnCorrectAmount() {
         rental.setReturnDate(LocalDateTime.now().minusDays(1));
         rental.setActualDate(LocalDateTime.now());
+        when(rentalService.findById(ID)).thenReturn(rental);
 
-        BigDecimal fineAmount = paymentCalculationService.calculateFineAmount(rental);
+        BigDecimal fineAmount = paymentCalculationService.calculateFineAmount(payment);
 
         BigDecimal expectedAmount = BigDecimal.valueOf(1.2);
         assertEquals(expectedAmount, fineAmount);

@@ -1,5 +1,8 @@
 package project.controler;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import project.config.SecurityConfig;
+import project.dto.request.PaymentRequestDto;
 import project.model.Rental;
 import project.model.car.Car;
 import project.model.car.CarType;
@@ -57,16 +61,12 @@ class PaymentControllerTest {
     @MockBean
     private RentalService rentalService;
 
-    @MockBean
-    private Session sessionMock;
-
-
     @BeforeEach
     void setUp() {
         RestAssuredMockMvc.mockMvc(mockMvc);
     }
 
-    /*@Test
+    @Test
     @WithMockUser(roles = {"MANAGER", "CUSTOMER"})
     public void shouldCreatePayment_ok() {
         Role customer = new Role(1L, RoleName.CUSTOMER);
@@ -90,6 +90,7 @@ class PaymentControllerTest {
         payment.setId(1L);
         payment.setRental(rental);
         payment.setType(PaymentType.PAYMENT);
+        payment.setStatus(PaymentStatus.PENDING);
 
         BigDecimal moneyToFine = BigDecimal.valueOf(100);
         BigDecimal moneyToPay = BigDecimal.valueOf(100);
@@ -99,32 +100,30 @@ class PaymentControllerTest {
         when(paymentCalculationService.calculatePaymentAmount(payment))
                 .thenReturn(moneyToPay);
 
-        when(paymentCalculationService.calculateFineAmount(rental))
+        when(paymentCalculationService.calculateFineAmount(payment))
                 .thenReturn(moneyToFine);
-
 
         when(rentalService.findById(anyLong())).thenReturn(rental);
 
-        when(paymentProvider.createPaymentSession(Mockito.any(BigDecimal.class),
-                Mockito.any(BigDecimal.class), Mockito.any(Payment.class))).thenReturn(sessionMock);
+        when(paymentService.save(any())).thenReturn(payment);
 
-        when(sessionMock.getUrl()).thenReturn("expectedUrl");
+        Session sessionMock = Mockito.mock(Session.class);
+        when(paymentProvider.createPaymentSession(any(), any(), any())).thenReturn(sessionMock);
         when(sessionMock.getId()).thenReturn("id");
-
-        payment.setUrl(sessionMock.getUrl());
-        payment.setSessionId(sessionMock.getId());
-
-
-        when(paymentService.save(payment)).thenReturn(payment);
+        when(sessionMock.getUrl()).thenReturn("google.com");
 
         RestAssuredMockMvc.given()
-                .contentType(ContentType.JSON)
                 .body(new PaymentRequestDto(payment.getRental().getId(), payment.getType()))
+                .contentType(ContentType.JSON)
                 .when()
                 .post("/payments")
                 .then()
-                .statusCode(200);
-    }*/
+                .statusCode(200)
+                .body("id", notNullValue())
+                .body("status", equalTo(PaymentStatus.PENDING.toString()))
+                .body("amount", equalTo(100))
+                .body("sessionId", equalTo(payment.getSessionId()));
+    }
 
     @Test
     public void testGetSucceed() {
@@ -146,8 +145,9 @@ class PaymentControllerTest {
         payment.setType(PaymentType.PAYMENT);
         payment.setRental(rental);
 
+        when(rentalService.findById(anyLong())).thenReturn(rental);
         when(paymentService.getById(anyLong())).thenReturn(payment);
-        when(paymentService.save(Mockito.any(Payment.class))).thenReturn(payment);
+        when(paymentService.save(any(Payment.class))).thenReturn(payment);
 
         RestAssuredMockMvc.when()
                 .get("/payments/success/{id}", paymentId)
@@ -180,7 +180,6 @@ class PaymentControllerTest {
 
         when(paymentService.findAll()).thenReturn(payments);
 
-
         RestAssuredMockMvc.when()
                 .get("/payments/my-payments")
                 .then()
@@ -207,8 +206,9 @@ class PaymentControllerTest {
         payment.setType(PaymentType.PAYMENT);
         payment.setRental(rental);
 
+        when(rentalService.findById(anyLong())).thenReturn(rental);
         when(paymentService.getById(anyLong())).thenReturn(payment);
-        when(paymentService.save(Mockito.any(Payment.class))).thenReturn(payment);
+        when(paymentService.save(any(Payment.class))).thenReturn(payment);
         RestAssuredMockMvc.when()
                 .get("/payments/cancel/{id}", paymentId)
                 .then()

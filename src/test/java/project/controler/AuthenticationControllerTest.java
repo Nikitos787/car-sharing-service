@@ -1,6 +1,7 @@
 package project.controler;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -60,8 +61,8 @@ class AuthenticationControllerTest {
 
     @Test
     public void shouldRegister_ok() {
-        when(authenticationService.register(anyString(), anyString(),
-                        anyString(), anyString())).thenReturn(user)
+        when(authenticationService.register(eq(user.getEmail()), eq(user.getPassword()),
+                eq(user.getFirstName()), eq(user.getLastName()))).thenReturn(user)
                 .thenReturn(user);
 
         RestAssuredMockMvc.given()

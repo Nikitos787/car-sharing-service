@@ -11,17 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import project.model.Rental;
 
 @DataJpaTest
-@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import(ContainersConfig.class)
 class RentalRepositoryTest {
     private static final int EXPECTED_SIZE = 1;
     private static final int NOT_EXPECTED_SIZE = 2;
@@ -41,19 +37,6 @@ class RentalRepositoryTest {
     private static final int SIZE_OF_OVERDUE_RENTAL = 0;
     private static final int OVERDUE_YEAR = 2022;
     private static final int OVERDUE_TEST_DIGIT = 2;
-
-    @Container
-    static MySQLContainer<?> database = new MySQLContainer<>("mysql:5.7")
-            .withDatabaseName("springboot")
-            .withPassword("springboot")
-            .withUsername("springboot");
-
-    @DynamicPropertySource
-    static void setDatasourceProperties(DynamicPropertyRegistry propertyRegistry) {
-        propertyRegistry.add("spring.datasource.url", database::getJdbcUrl);
-        propertyRegistry.add("spring.datasource.password", database::getPassword);
-        propertyRegistry.add("spring.datasource.username", database::getUsername);
-    }
 
     @Autowired
     private RentalRepository rentalRepository;

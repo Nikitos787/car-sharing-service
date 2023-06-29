@@ -99,6 +99,7 @@
 - Get a token to create a Telegram bot from https://t.me/BotFather
 - Get stripe secret api key from [website](https://stripe.com/)
 - Set your credentials in [application.properties](src/main/resources/application.properties)
+- Set your credentials for tests in [application.properties](src/test/resources/application.properties)
 - Build the project: `mvn clean package`
 - Press `run`
 
@@ -106,6 +107,8 @@
 - Ensure that you have Docker installed and running
 - Clone the repository from [here](https://github.com/Nikitos787/car-sharing-service.git);
 - Set up the necessary environment variables (refer to [.env](.env) for the required variables)
+- Set your credentials in [application.properties](src/main/resources/application.properties)
+- Set your credentials for tests in [application.properties](src/test/resources/application.properties)
 - Build the project: `mvn clean package`
 - Run the command: `docker-compose up`
 - You can test the application using Swagger by accessing http://localhost:8080/swagger-ui/index.html#
@@ -116,5 +119,5 @@
 or [this link](https://www.postman.com/supply-observer-16858482/workspace/for-people/collection/27238121-3ac30850-3272-4643-adc5-cb50552da2bd?action=share&creator=27238121)
 - [Collection for docker run](postman.collections/car-sharing-service%20for%20docker.postman_collection.json) 
 or [this link](https://www.postman.com/supply-observer-16858482/workspace/for-people/collection/27238121-7cc8d2bb-cae7-4be3-b986-4fc7608c6366?action=share&creator=27238121)
-- if you want to run tests, you should run docker before this.
->Just import it to your Postman and enjoy! Good luck!
+- if you want to run tests, you should run docker before this. Also don't forget add properties in application.properties for tests [here](src/test/resources/application.properties)
+> Just import it to your Postman and enjoy! Good luck!
